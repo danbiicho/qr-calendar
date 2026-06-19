@@ -8,14 +8,20 @@
   var params = new URLSearchParams(window.location.search);
   var day = params.get('day');
   
-  fetch('urls.json')
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
-      if (data[day]) {
-        window.location.href = data[day];
-      } else {
-        document.body.innerHTML = '해당 날짜를 찾을 수 없습니다.';
+  var csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSw5qJKbh1ardONIzH2eICfS4wqVmp0pedRlAy1PnUdGLNOgculcorA_aHxqJ4FztdRdJiV5_5gBML6/pub?gid=0&single=true&output=csv';
+  
+  fetch(csvUrl)
+    .then(function(res) { return res.text(); })
+    .then(function(csv) {
+      var rows = csv.split('\n');
+      for (var i = 1; i < rows.length; i++) {
+        var cols = rows[i].split(',');
+        if (cols[0].trim() == day) {
+          window.location.href = cols[1].trim();
+          return;
+        }
       }
+      document.body.innerHTML = '해당 날짜를 찾을 수 없습니다.';
     });
 </script>
 </body>
